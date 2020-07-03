@@ -1,6 +1,8 @@
 asgiref
 Django
 djangorestframework
+Pillow
 psycopg2-binary
+python-magic-bin
 pytz
 sqlparse
