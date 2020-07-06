@@ -12,9 +12,6 @@ class LengthenURL(APIView):
             shortHash=shortHash
         )
 
-        redirectURL: str = request.get_host() + shortener.urlSuffix
-        print(shortener.urlSuffix)
-
         return redirect(shortener.urlSuffix)
 
 
