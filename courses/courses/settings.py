@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     # Custom apps
     'api',
+    'shortener',
 
     # Third party apps
     'rest_framework',

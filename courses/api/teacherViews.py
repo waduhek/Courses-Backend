@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 from rest_framework.views import APIView
 
+from shortener.views import shortenURL
+
 from .models import Course, CourseTaughtByTeacher, UserSessionMapping
 from .serialisers import CourseSerialiser
 
@@ -41,7 +43,18 @@ class AllCourses(APIView):
             else:
                 # Serialise this course information.
                 serialisedCourse = CourseSerialiser(courseTaught)
+                courseJSON = serialisedCourse.data
 
-                responseData.append(serialisedCourse.data)
+                # Shorten the URL of the course image.
+                # The URL as returned from the database is not absolute
+                # and so we need to prepend a '/' to the URL to make it
+                # absolute.
+                shortHash: str = shortenURL('/' + courseJSON['image'])
+
+                # Modify the URL of the course image.
+                courseJSON['image'] = (request.get_host() + '/short/'
+                                       + shortHash)
+
+                responseData.append(courseJSON)
 
         return Response(responseData, HTTP_200_OK)

@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('api/', include('api.urls', namespace='api')),
+    path('short/', include('shortener.urls', namespace='shortener')),
 ]
 
 # Allow for media files to be served if project is in debug mode.
