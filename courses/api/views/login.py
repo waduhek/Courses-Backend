@@ -1,3 +1,5 @@
+from typing import Dict, Union
+
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
@@ -11,9 +13,9 @@ from rest_framework.status import (HTTP_200_OK, HTTP_400_BAD_REQUEST,
                                    HTTP_500_INTERNAL_SERVER_ERROR)
 from rest_framework.views import APIView
 
-from .models import Student, Teacher, UserSessionMapping
-from .serialisers import SessionSerialiser
-from .utils import _updateSessionExpiryDate, createSessionForUser
+from api.models import Student, Teacher, UserSessionMapping
+from api.serialisers import SessionSerialiser
+from api.utils import _updateSessionExpiryDate, createSessionForUser
 
 
 class LoginView(APIView):
@@ -47,7 +49,7 @@ class LoginView(APIView):
                 newSession
             )
 
-            responseData: dict = {
+            responseData: Dict[str, Union[bool, str]] = {
                 # User information.
                 'firstName': user.first_name,
                 'lastName': user.last_name,
@@ -62,7 +64,7 @@ class LoginView(APIView):
                 # which is a string and so it can be sent to the client.
                 'sessionExpireDate': sessionSerialiser.data['expire_date'],
                 # Flag set only if the user is a teacher.
-                'isTeacher': True if teacherUser is not None else False
+                'isTeacher': True if teacherUser else False
             }
 
             # Change the last login time to the current time.
@@ -82,7 +84,9 @@ class LoginView(APIView):
 
             return response
         else:
-            responseData: dict = {'body': 'Invalid user credentials.'}
+            responseData: Dict[str, str] = {
+                'body': 'Invalid user credentials.'
+            }
             # User is unauthorised, return UNAUTHORIZED.
             return Response(responseData, status=HTTP_401_UNAUTHORIZED)
 
@@ -99,7 +103,7 @@ class LogoutView(APIView):
             print('Found session ID in request body')
             sessionID = request.data['sessionID']
         else:
-            responseData: dict = {
+            responseData: Dict[str, str] = {
                 'body': 'Could not obtain the session ID. Make sure that'
                         + 'the session ID is either in the body or set as a '
                         + 'cookie.'
@@ -110,7 +114,7 @@ class LogoutView(APIView):
         try:
             existingSession: Session = Session.objects.get(pk=sessionID)
         except ObjectDoesNotExist:
-            responseData: dict = {
+            responseData: Dict[str, str] = {
                 'body': 'Could not find the requested session.'
             }
             return Response(responseData, status=HTTP_404_NOT_FOUND)
@@ -120,7 +124,7 @@ class LogoutView(APIView):
 
         # Check if the delete operation was successful.
         if existingSession.session_key is None:
-            responseData: dict = {
+            responseData: Dict[str, str] = {
                 'body': 'Successfully deleted session.'
             }
             # Create a new response.
@@ -131,7 +135,7 @@ class LogoutView(APIView):
 
             return response
         else:
-            responseData: dict = {
+            responseData: Dict[str, str] = {
                 'body': 'Session was found but could not be terminated.'
             }
             # Create a new response.
@@ -153,7 +157,9 @@ class SignupView(APIView):
         # Although client side validation takes place this is done as a
         # redundancy step.
         if requestData['password'] != requestData['confirmPassword']:
-            responseData: dict = {'body': 'The passwords don\'t match.'}
+            responseData: Dict[str, str] = {
+                'body': 'The passwords don\'t match.'
+            }
             return Response(responseData, status=HTTP_400_BAD_REQUEST)
 
         # Try to create a new user with the received credentials.
@@ -167,7 +173,9 @@ class SignupView(APIView):
             )
         except IntegrityError:
             # Username is already taken return error to the client.
-            responseData: dict = {'body': 'Requested username is taken.'}
+            responseData: Dict[str, str] = {
+                'body': 'Requested username is taken.'
+            }
             # Here, we use a custom HTTP response code if the username
             # could not be allocated to the user.
             return Response(responseData, status=599)
@@ -205,7 +213,7 @@ class SignupView(APIView):
 
             # Construct the same type of response data as constructed in
             # the login view.
-            responseData: dict = {
+            responseData: Dict[str, Union[str, bool]] = {
                 'firstName': newUser.first_name,
                 'lastName': newUser.last_name,
                 'email': newUser.email,
@@ -226,7 +234,7 @@ class SignupView(APIView):
         else:
             # Something went wrong while creating a session. Send out a
             # 500 HTTP code.
-            responseData: dict = {
+            responseData: Dict[str, str] = {
                 'body': 'Could not create a session for the user.'
             }
             return Response(
@@ -259,7 +267,7 @@ class ValidateSessionView(APIView):
             _updateSessionExpiryDate(session)
 
             # Construct the response to the client.
-            responseData: dict = {
+            responseData: Dict[str, str] = {
                 'firstName': sessionMapping.user.first_name,
                 'lastName': sessionMapping.user.last_name,
                 'email': sessionMapping.user.email,

@@ -1,24 +1,31 @@
 from django.urls import path
 
-from . import loginViews, teacherViews
+from .views import course, login, teacher
 
 app_name = 'api'
 
 urlpatterns = [
     # Login URLs.
-    path('login/', loginViews.LoginView.as_view(), name='login'),
-    path('logout/', loginViews.LogoutView.as_view(), name='logout'),
-    path('signup/', loginViews.SignupView.as_view(), name='signup'),
+    path('login/', login.LoginView.as_view(), name='login'),
+    path('logout/', login.LogoutView.as_view(), name='logout'),
+    path('signup/', login.SignupView.as_view(), name='signup'),
     path(
-        'validate/', loginViews.ValidateSessionView.as_view(),
+        'validate/', login.ValidateSessionView.as_view(),
         name='validate'
     ),
 
     # Teacher URLs.
     # All courses.
-    path('teacher/course/all/', teacherViews.AllCourses.as_view()),
-    # Detail view of course.
-    # path('teacher/course/<int:courseID>/'),
+    path(
+        'teacher/course/all/', teacher.AllCourses.as_view(),
+        name='courseAll'
+    ),
     # Update view for course.
     # path('teacher/course/update/<int:courseID>/'),
+
+    # Course URLs.
+    # Detail view of course.
+    path('course/detail/<int:courseID>/', course.CourseDetailView.as_view(),
+         name='courseDetail'
+    ),
 ]

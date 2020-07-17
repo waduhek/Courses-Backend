@@ -11,8 +11,7 @@ from .models import UserSessionMapping
 
 
 def createSessionForUser(user: User) -> Optional[Session]:
-    """
-    Function that will return a session for the given
+    """Will return a session for the given
     `django.contrib.auth.models.User` object. It will look up in the
     `api.models.UserSessionMapping` table to find out if a session
     already exists for the user. If an existing session is found, it
@@ -25,7 +24,7 @@ def createSessionForUser(user: User) -> Optional[Session]:
     :rtype: Session or None
     """
     # The return value.
-    session: Session = None
+    session: Optional[Session] = None
 
     # Search the `UserSessionMapping` table for this user.
     try:
@@ -48,7 +47,7 @@ def createSessionForUser(user: User) -> Optional[Session]:
         # TODO: Manage when multiple sessions were found.
         pass
     else:
-        # A `UserSessionMapping` object was found fro this user. So we
+        # A `UserSessionMapping` object was found for this user. So we
         # return that session for the user.
         session = Session.objects.get(pk=sessionMap.session)
 
@@ -56,7 +55,7 @@ def createSessionForUser(user: User) -> Optional[Session]:
 
 
 def _updateSessionExpiryDate(session: Session):
-    """This function is used to update the given session's expiry date.
+    """Used to update the given session's expiry date.
 
     If there are less than 30 days for the session to expire, this
     function will add another 30 days to the session's expiry date.

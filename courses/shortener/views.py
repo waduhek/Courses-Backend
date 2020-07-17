@@ -1,7 +1,7 @@
 from django.db import IntegrityError
+from django.shortcuts import redirect
 from rest_framework.request import Request
 from rest_framework.views import APIView
-from django.shortcuts import redirect
 
 from .models import URLShortener
 
@@ -16,11 +16,12 @@ class LengthenURL(APIView):
 
 
 def shortenURL(urlSuffix: str) -> str:
-    """This function is used to shorten the length of the URL. This
-    function does not have any associated with any URL.
+    """Used to shorten the length of the URL. This function does not
+    have any associated URL.
 
     :param urlSuffix: The absolute address that has to be shortened. For
         example, '/media/courses/images/image.png'.
+    :type urlSuffix: str
 
     :return: The first 15 characters of the SHA256 hash generated for
         the URL.
